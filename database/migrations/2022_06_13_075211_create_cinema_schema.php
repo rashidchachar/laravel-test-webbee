@@ -36,7 +36,67 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('cinemas', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('location');
+            $table->timestamps();
+        });
+
+        Schema::create('movies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('title');
+            $table->text('description');
+            $table->integer('duration');
+            $table->string('genre');
+            $table->date('release_date');
+            $table->timestamps();
+        });
+
+        Schema::create('shows', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('cinema_id');
+            $table->unsignedInteger('movie_id');
+            $table->dateTime('start_time');
+            $table->dateTime('end_time');
+            $table->boolean('is_booked_out')->default(false);
+            $table->timestamps();
+
+            $table->foreign('cinema_id')->references('id')->on('cinemas');
+            $table->foreign('movie_id')->references('id')->on('movies');
+        });
+
+        Schema::create('pricing', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('show_id');
+            $table->decimal('price', 8, 2);
+            $table->timestamps();
+
+            $table->foreign('show_id')->references('id')->on('shows');
+        });
+
+        Schema::create('seats', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('show_id');
+            $table->string('seat_number');
+            $table->string('seat_type');
+            $table->timestamps();
+
+            $table->foreign('show_id')->references('id')->on('shows');
+        });
+
+        Schema::create('bookings', function (Blueprint $table) {
+            $table->increments('id');
+            $table->unsignedInteger('show_id');
+            $table->unsignedInteger('seat_id');
+            $table->string('user_id');
+            $table->date('booking_date');
+            $table->string('booking_status');
+            $table->timestamps();
+
+            $table->foreign('show_id')->references('id')->on('shows');
+            $table->foreign('seat_id')->references('id')->on('seats');
+        });
     }
 
     /**
@@ -46,5 +106,11 @@ class CreateCinemaSchema extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('cinemas');
+        Schema::dropIfExists('movies');
+        Schema::dropIfExists('shows');
+        Schema::dropIfExists('pricing');
+        Schema::dropIfExists('seats');
+        Schema::dropIfExists('bookings');
     }
 }
