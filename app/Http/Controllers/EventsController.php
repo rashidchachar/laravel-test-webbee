@@ -9,6 +9,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Testing\TestResponse;
 
 class EventsController extends BaseController
 {
@@ -102,8 +103,8 @@ class EventsController extends BaseController
      */
 
     public function getEventsWithWorkshops() {
-        return Event::with('workshops')->get();
-//        return response()->json($events);
+        $events = Event::with('workshops')->get();
+        return response()->json($events->toArray());
 
     }
 
@@ -202,6 +203,6 @@ class EventsController extends BaseController
             $eventsWithWorkshops[] = $event;
         }
 
-        return $eventsWithWorkshops;
+        return response()->json($eventsWithWorkshops);
     }
 }
